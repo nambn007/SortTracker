@@ -1,0 +1,3 @@
+/home/namdz/myproject/SortTracker/build/CMakeFiles/SortTracker.dir
+/home/namdz/myproject/SortTracker/build/CMakeFiles/edit_cache.dir
+/home/namdz/myproject/SortTracker/build/CMakeFiles/rebuild_cache.dir

@@ -5,7 +5,18 @@
 #include "SortTrack.h"
 #include "munkres/munkres.h"
 
-void hungarian_matching(std::vector<std::vector<float>> iou_matrix, size_t nrows, size_t ncols, std::vector<std::vector<float>>& association)
+
+namespace tracker 
+{
+/**
+ * @brief Hungarian matching algorithm
+ * 
+ * @param iou_matrix: iou matrix from detections and tracked objects
+ * @param nrows: number of detections
+ * @param ncols: number of tracked objects
+ * @param association: association matrix
+ */
+inline void hungarian_matching(std::vector<std::vector<float>> iou_matrix, size_t nrows, size_t ncols, std::vector<std::vector<float>>& association)
 {
     Matrix<float> matrix(nrows, ncols);
     for (int i = 0; i < nrows; i++) {
@@ -25,15 +36,23 @@ void hungarian_matching(std::vector<std::vector<float>> iou_matrix, size_t nrows
     }
 }
 
-void associate_detections_to_trackers(
+/**
+    * @brief Associate detections to tracked object
+    * @param dets: detections
+    * @param tracks: tracked objects
+    * @param iou_theshold: iou threshold
+    * @param matches: matched pairs
+    * @param unmatched_detections: unmatched detections
+    * @param unmatched_tracks: unmatched tracks 
+*/
+inline void associate_detections_to_trackers(
     std::vector<Detection>& dets, 
     std::vector<SortTrack> tracks, 
-    float iou_theshold=0.3)
+    float iou_theshold,
+    std::vector<std::pair<int,int>>& matches,
+    std::vector<int>& unmatched_detections,
+    std::vector<int>& unmatched_tracks)
 {
-    std::vector<std::pair<int, int>> matches;
-    std::vector<int> unmatched_detections;
-    std::vector<int> unmatched_tracks;
-
     if (tracks.empty()) {
         for (int i = 0; i < dets.size(); i++) {
             unmatched_detections.push_back(i);
@@ -88,28 +107,5 @@ private:
     float iou_threshold;
     std::vector<SortTrack> tracks; 
 };
-
-
-SortTracker::SortTracker(int max_age, int min_hits, float iou_threshold)
-{
-    this->max_age = max_age;
-    this->min_hits = min_hits;
-    this->iou_threshold = iou_threshold;
-    this->tracks.clear();
-    this->frame_count = 0;
-}
-
-SortTracker::~SortTracker() {}
-
-void SortTracker::update(std::vector<Detection>& dets)
-{
-    this->frame_count++;
-
-    std::remove_if(this->tracks.begin(), this->tracks.end(), [](SortTrack& track){
-        Detection det = track.predict();
-        if (det.bbox.x1 < 0 || det.bbox.y1 < 0 || det.bbox.x2 || det.bbox.y2 < 0)
-            return true;
-        return false;
-    });
 
 }
