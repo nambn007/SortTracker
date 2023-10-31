@@ -25,3 +25,4 @@ x = np.array([1, 2, 3, 4]).reshape((4, 1))
 print(x)
 x = reshape_z(x, 4, 7)
 print(x)
+

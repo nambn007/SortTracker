@@ -49,6 +49,7 @@ void associate_detections_to_trackers(
             iou_matrix[i][j] = iou(dets[i].bbox, tracks[i].getStateDetection().bbox);
         }
     }
+    
 
     std::vector<std::vector<float>> association;
     association.resize(dets.size(), std::vector<float>(tracks.size()));
@@ -56,12 +57,17 @@ void associate_detections_to_trackers(
     hungarian_matching(iou_matrix, dets.size(), tracks.size(), association);
 
     for (int i = 0; i < dets.size(); i++) {
-        bool matched_flag = false;
         for (int j = 0; j < tracks.size(); j++) {
             if (association[i][j] == 0) {
-                if (iou_matrix[i][j] > iou_theshold) {
-                    matched_flag
-                }
+                unmatched_detections.push_back(i);
+                unmatched_tracks.push_back(j);
+            }
+            else if (association[i][j] < iou_theshold) {
+                unmatched_detections.push_back(i);
+                unmatched_tracks.push_back(j);
+            }
+            else {
+                matches.push_back(std::make_pair(i, j));
             }
         }
     }
